@@ -1,0 +1,42 @@
+create table publisher (name varchar(20) primary key,phone integer,address varchar(20));
+
+create table book (book_id integer primary key,title varchar(20),pub_year varchar(20),pub_name varchar(20),foreign key (pub_name) references publisher(name) on delete cascade);
+
+create table book_authors (author_name varchar(20),book_id integer,foreign key (book_id) references book(book_id) on delete cascade,primary key (book_id, author_name));
+
+create table library_programme (programme_id integer primary key,programme_name varchar(50),address varchar(50));
+
+create table book_copies (no_of_copies integer,book_id integer,programme_id integer,foreign key (book_id) references book(book_id) on delete cascade,foreign key (programme_id) references library_programme(programme_id) on delete cascade,primary key (book_id, programme_id));
+
+create table card (card_no integer primary key);
+
+create table book_lending (book_id integer,programme_id integer,card_no integer,date_out date,due_date date,foreign key (book_id) references book(book_id) on delete cascade,foreign key (programme_id) references library_programme(programme_id) on delete cascade,foreign key (card_no) references card(card_no) on delete cascade,primary key (book_id, programme_id, card_no));
+
+insert into publisher values('sapna', 912121212, 'bangalore');insert into publisher values('penguin', 921212121, 'new york');insert into publisher values('pearson', 913131313, 'hyderabad');insert into publisher values('ozone', 931313131, 'chennai');insert into publisher values('planetz', 914141414, 'bangalore');
+
+insert into book values(1, 'basics of excel', 'jan-2017', 'sapna');insert into book values(2, 'programming mindset', 'jun-2018', 'planetz');insert into book values(3, 'basics of sql', 'sep-2016', 'pearson');insert into book values(4, 'dbms for beginners', 'sep-2015', 'planetz');insert into book values(5, 'web services', 'may-2017', 'ozone');
+
+insert into book_authors values('sri devi', 1);insert into book_authors values('deepak', 2);insert into book_authors values('pramod', 3);insert into book_authors values('swathi', 4);insert into book_authors values('prathima', 5);
+
+insert into library_programme values(100, 'hsr layout', 'bangalore');insert into library_programme values(101, 'kengeri', 'bangalore');insert into library_programme values(102, 'banashankari', 'bangalore');insert into library_programme values(103, 'shankara nagar', 'mangalore');insert into library_programme values(104, 'manipal', 'udupi');
+
+insert into book_copies values(10, 1, 100);insert into book_copies values(16, 1, 101);insert into book_copies values(20, 2, 102);insert into book_copies values(6, 2, 103);insert into book_copies values(4, 3, 104);insert into book_copies values(7, 5, 100);insert into book_copies values(3, 4, 101);
+
+insert into card values(500);insert into card values(501);insert into card values(502);insert into card values(503);insert into card values(504);
+
+insert into book_lending values(1, 100, 501, '2017-01-01', '2017-01-31');insert into book_lending values(3, 104, 501, '2017-01-11', '2017-03-01');insert into book_lending values(2, 103, 501, '2017-02-21', '2017-04-21');insert into book_lending values(4, 101, 501, '2017-03-11', '2017-06-11');insert into book_lending values(1, 101, 504, '2017-04-09', '2017-07-08');
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+select b.book_id, b.title, b.pub_name, a.author_name, c.no_of_copies, c.branch_id from book b, book_author a, book_copies c where b.book_id = a.book_id and b.book_id = c.book_id;
+
+select card_no, date_out, due_date from book_lending where date_out between '2019-01-01' and '2019-06-30' group by card_no having count(*) > 3;
+
+delete from book where book_id = 1001;
+
+create view v_publication as select pub_year from book;
+select * from v_publication;
+
+create view v_books as select b.book_id, b.title, c.no_of_copies from book b, book_copies c, library_branch l where b.book_id = c.book_id and c.branch_id = l.branch_id;
+
+
+

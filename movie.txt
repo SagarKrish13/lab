@@ -1,0 +1,34 @@
+create table actor (act_id integer primary key,act_name varchar(20),act_gender char(1));
+
+create table director (dir_id integer primary key,dir_name varchar(20),dir_phone integer);
+
+create table movies (mov_id integer primary key,mov_title varchar(25),mov_year integer,mov_lang varchar(15),dir_id integer,foreign key (dir_id) references director(dir_id));
+
+create table movie_cast (act_id integer,mov_id integer,role varchar(10),primary key (act_id, mov_id),foreign key (act_id) references actor(act_id),foreign key (mov_id) references movies(mov_id));
+
+create table rating (mov_id integer primary key,rev_stars varchar(25),foreign key (mov_id) references movies(mov_id));
+
+insert into actor values(101,'rahul','m');insert into actor values(102,'ankitha','f');insert into actor values(103,'radhika','f');insert into actor values(104,'chethan','m');insert into actor values(105,'vivan','m');
+
+insert into director values(201,'anup',918181818);insert into director values(202,'hitchcock',918181812);insert into director values(203,'shashank',918181813);insert into director values(204,'steven spielberg',918181814);insert into director values(205,'anand',918181815);
+
+insert into movies values(1001,'manasu',2017,'kannada',201);insert into movies values(1002,'aakasham',2015,'telugu',202);insert into movies values(1003,'kaliyona',2008,'kannada',201);insert into movies values(1004,'war horse',2011,'english',204);insert into movies values(1005,'home',2012,'english',205);
+
+insert into movie_cast values(101,1002,'hero');insert into movie_cast values(101,1001,'hero');insert into movie_cast values(103,1003,'heroine');insert into movie_cast values(103,1002,'guest');insert into movie_cast values(104,1004,'hero');
+
+insert into rating values(1001,4);insert into rating values(1002,2);insert into rating values(1003,5);insert into rating values(1004,4);insert into rating values(1005,3);
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+select mov_title from movies where dir_id in (select dir_id from director where dir_name = 'abcd');
+
+select mov_title from movies m join movie_cast c on m.mov_id = c.mov_id where c.act_id in (select act_id from movie_cast group by act_id having count(act_id) > 0)group by mov_title having count(*) > 1;
+
+select a.act_name from actor a join movie_cast c on a.act_id = c.act_id join movies m on c.mov_id = m.mov_id where m.mov_year < 2000 and exists (select a.act_name from actor a join movie_cast c on a.act_id = c.act_id join movies m on c.mov_id = m.mov_id where m.mov_year > 2015);
+
+select m.mov_title, max(r.rev_stars) as highest_rating from movies m, rating r where m.mov_id = r.mov_id group by m.mov_title having count(r.rev_stars) > 0 order by m.mov_title;
+
+update rating set rev_stars = 5 where mov_id in (select mov_id from movies where dir_id in (select dir_id from director where dir_name = 'xyz'));
+

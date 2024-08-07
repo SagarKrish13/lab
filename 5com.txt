@@ -1,0 +1,37 @@
+create table department(dno varchar(20) primary key,dname varchar(20),mgrstartdate date);
+
+create table employee(ssn varchar(20) primary key,fname varchar(20),lname varchar(20),address varchar(20),sex char(1),salary integer,superssn varchar(20) references employee(ssn),dno varchar(20) references department(dno));
+
+alter table department
+add mgrssn varchar(20) references employee(ssn);
+
+create table dlocation(dloc varchar(20),dno varchar(20) references department(dno),primary key (dno, dloc));
+
+create table project(pno integer primary key,pname varchar(20),plocation varchar(20),dno varchar(20) references department(dno));
+
+create table works_on(hours int,ssn varchar(20) references employee(ssn),pno integer references project(pno),primary key (ssn, pno));
+
+insert into employee (ssn, fname, lname, address, sex, salary)values ('rnsece01', 'john', 'scott', 'bangalore', 'm', 450000);insert into employee (ssn, fname, lname, address, sex, salary)values ('rnskcse01', 'james', 'smith', 'bangalore', 'm', 500000);insert into employee (ssn, fname, lname, address, sex, salary)values ('rnskcse02', 'hearn', 'baker', 'bangalore', 'm', 700000);insert into employee (ssn, fname, lname, address, sex, salary)values ('rnskcse03', 'edward', 'scott', 'mysore', 'm', 500000);insert into employee (ssn, fname, lname, address, sex, salary)values ('rnskcse04', 'pavan', 'hegde', 'mangalore', 'm', 650000);insert into employee (ssn, fname, lname, address, sex, salary)values ('rnskcse05', 'girish', 'malya', 'mysore', 'm', 450000);
+
+insert into department values ('1', 'accounts', '2001-01-01', 'rnsacc02');insert into department values ('2', 'it', '2016-08-01', 'rnsit01');insert into department values ('3', 'ece', 
+'2008-06-01', 'rnsece01');insert into department values ('4', 'ise', '2015-08-01', 'rnsise01');insert into department values ('5', 'cse', '2002-06-01', 'rnskcse05');
+
+update employee set superssn = null, dno = '3' where ssn = 'rnsece01';update employee set superssn = 'rnskcse02', dno = '5' where ssn = 'rnskcse01';update employee set superssn = 'rnskcse03', dno = '5' where ssn = 'rnskcse02';update employee set superssn = 'rnskcse04', dno = '5' where ssn = 'rnskcse03';
+
+update employee set dno = '5', superssn = 'rnskcse05' where ssn = 'rnskcse04'; update employee set dno = '5', superssn = 'rnskcse06' where ssn = 'rnskcse05';update employee set dno = '5', superssn = null where ssn = 'rnskcse06';update employee set dno = '1', superssn = 'rnsacc02' where ssn = 'rnsacc01';update employee set dno = '1', superssn = null where ssn = 'rnsacc02';update employee set dno = '4', superssn = null where ssn = 'rnsise01';update employee set dno = '2', superssn = null where ssn = 'rnsit01';
+
+insert into dlocation values ('bangalore', '1');insert into dlocation values ('bangalore', '2');insert into dlocation values ('bangalore', '3');insert into dlocation values ('mangalore', '4');insert into dlocation values ('mangalore', '5');
+
+insert into project values (100, 'iot', 'bangalore', '5');insert into project values (101, 'cloud', 'bangalore', '5');insert into project values (102, 'bigdata', 'bangalore', '5');insert into project values (103, 'sensors', 'bangalore', '3');insert into project values (104, 'bank management', 'bangalore', '1');insert into project values (105, 'salary management', 'bangalore', '1');insert into project values (106, 'openstack', 'bangalore', '4');insert into project values (107, 'smart city', 'bangalore', '2');
+
+insert into works_on values (4, 'rnskcse01', 100);insert into works_on values (6, 'rnskcse01', 101);insert into works_on values (8, 'rnskcse01', 102);insert into works_on values (10, 'rnskcse02', 100);insert into works_on values (3, 'rnskcse04', 100);insert into works_on values (4, 'rnskcse05', 101);insert into works_on values (5, 'rnskcse06', 102);insert into works_on values (6, 'rnskcse03', 102);insert into works_on values (7, 'rnsece01', 103);insert into works_on values (5, 'rnsacc01', 104);insert into works_on values (6, 'rnsacc02', 105);insert into works_on values (4, 'rnsise01', 106);insert into works_on values (10, 'rnsit01', 107);
+--------------------------------------------------
+(select distinct p.pno from project p join department d on p.dno = d.dno join employee e on d.mgrssn = e.ssn where e.lname = 'scott')union(select distinct p1.pno from project p1 join works_on w on p1.pno = w.pno join employee e1 on w.ssn = e1.ssn where e1.lname = 'scott');
+
+select e.fname, e.lname, 1.1 * e.salary as incr_sal from employee e join works_on w on e.ssn = w.ssn join project p on w.pno = p.pno where p.pname = 'iot';
+
+select sum(e.salary) as total_salary,max(e.salary) as max_salary, min(e.salary) as min_salary, avg(e.salary) as avg_salary from employee e join department d on e.dno = d.dno where d.dname = 'accounts';
+
+select e.fname, e.lname from employee e where not exists (select pno from project where dno = '5' and pno not in (select pno from works_on where ssn = e.ssn));
+
+select d.dno, count(*)from department d join employee e on d.dno = e.dno where e.salary > 600000 and d.dno in (select e1.dno from employee e1 group by e1.dno having count(*) > 5)group by d.dno;
