@@ -1,0 +1,22 @@
+def find_numbers_with_square_divisible_by_8(numbers_list):
+    for number in numbers_list:
+        if (number ** 2) % 8 == 0:
+            print(number)
+input_string = input("Enter a list of numbers separated by commas: ")
+numbers_list = [int(num.strip()) for num in input_string.split(",")]
+print("Numbers whose square is divisible by 8:")
+find_numbers_with_square_divisible_by_8(numbers_list)
+---------------------------------------------------
+SyntaxError
+if(amount > 2999)
+print("You are eligible to purchase an item")
+if(amount > 299
+IndexError:
+num_list = [2, 3, 5, 7, 8, 9, 12, 16]
+num_list[8]
+ValueError:
+Int (’67.5’)
+TypeError
+1 a = 2
+2 b = 'DataCamp'
+----> 3 a + b

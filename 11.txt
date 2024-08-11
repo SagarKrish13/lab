@@ -1,0 +1,63 @@
+from bs4 import BeautifulSoup
+import requests
+
+def get_imd_movies(url):
+  """Fetches movie data from the given IMDB chart URL.
+
+  Args:
+      url: The URL of the IMDB chart (e.g., http://www.imdb.com/chart/top).
+
+  Returns:
+      A list of BeautifulSoup objects representing movie entries.
+  """
+  page = requests.get(url)
+  soup = BeautifulSoup(page.text, 'html.parser')
+  movies = soup.find_all("td", class_="titleColumn")
+  return movies
+
+def get_imd_summary(url):
+  """Extracts the summary from the given movie URL.
+
+  Args:
+      url: The URL of the movie page on IMDB.
+
+  Returns:
+      The first paragraph of the movie summary as a string.
+  """
+  movie_page = requests.get(url)
+  soup = BeautifulSoup(movie_page.text, 'html.parser')
+  summary_text = soup.find("div", class_="summary_text")
+  if summary_text:
+    return summary_text.contents[0].strip()
+  else:
+    return "Summary not found."
+
+def get_imd_movie_info(movie):
+  """Extracts title, year, and URL from a movie entry.
+
+  Args:
+      movie: A BeautifulSoup object representing a movie entry.
+
+  Returns:
+      A tuple containing movie title (string), year (string), and URL (string).
+  """
+  movie_title = movie.a.contents[0]
+  movie_year = movie.span.contents[0]
+  movie_url = 'http://www.imdb.com' + movie.a['href']
+  return movie_title, movie_year, movie_url
+
+def imd_movie_picker():
+  """Scrapes and displays information for 10 top movies on IMDB.
+  """
+  print("--------------------------------------------")
+  for movie in get_imd_movies('http://www.imdb.com/chart/top'):
+    movie_title, movie_year, movie_url = get_imd_movie_info(movie)
+    movie_summary = get_imd_summary(movie_url)
+    print(f"**{movie_title} ({movie_year})**")
+    print(movie_summary)
+    print("--------------------------------------------")
+    if len(movies) >= 10:  # Check if 10 movies have been processed already
+      break
+
+# Run the function in the notebook
+imd_movie_picker()
